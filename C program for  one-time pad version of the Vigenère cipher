@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_TEXT_LENGTH 100
+
+// Function to encrypt plaintext using the Vigenère cipher with one-time pad
+void encrypt(char *plaintext, int *key, int key_length) {
+    int len = strlen(plaintext);
+    int i;
+
+    printf("Ciphertext: ");
+    for (i = 0; i < len; i++) {
+        int shift = key[i % key_length]; // Get the shift value from key stream
+        char ch = plaintext[i];
+
+        if (ch >= 'a' && ch <= 'z') {
+            ch = 'a' + ((ch - 'a' + shift) % 26); // Encrypt lowercase letter
+        } else if (ch >= 'A' && ch <= 'Z') {
+            ch = 'A' + ((ch - 'A' + shift) % 26); // Encrypt uppercase letter
+        }
+        printf("%c", ch);
+    }
+    printf("\n");
+}
+
+// Function to decrypt ciphertext using the Vigenère cipher with one-time pad
+void decrypt(char *ciphertext, int *key, int key_length) {
+    int len = strlen(ciphertext);
+    int i;
+
+    printf("Plaintext: ");
+    for (i = 0; i < len; i++) {
+        int shift = key[i % key_length]; // Get the shift value from key stream
+        char ch = ciphertext[i];
+
+        if (ch >= 'a' && ch <= 'z') {
+            ch = 'a' + ((ch - 'a' - shift + 26) % 26); // Decrypt lowercase letter
+        } else if (ch >= 'A' && ch <= 'Z') {
+            ch = 'A' + ((ch - 'A' - shift + 26) % 26); // Decrypt uppercase letter
+        }
+        printf("%c", ch);
+    }
+    printf("\n");
+}
+
+int main() {
+    char plaintext[] = "sendmoremoney";
+    int key_stream[] = {9, 0, 1, 7, 23, 15, 21, 14, 11, 11, 2, 8, 9};
+    int key_length = sizeof(key_stream) / sizeof(key_stream[0]);
+
+    // Encrypt plaintext with the provided key stream
+    printf("Encrypting plaintext 'sendmoremoney':\n");
+    encrypt(plaintext, key_stream, key_length);
+
+    // Decrypt the ciphertext to match the plaintext 'cashnotneeded'
+    char ciphertext[] = "QwxjWkCJdqwiy";
+    printf("\nDecrypting ciphertext 'QwxjWkCJdqwiy' to match 'cashnotneeded':\n");
+    decrypt(ciphertext, key_stream, key_length);
+
+    return 0;
+}
