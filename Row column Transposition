@@ -1,0 +1,103 @@
+import math
+Â Â 
+key = "HACK"
+Â Â 
+# Encryption
+def encryptMessage(msg):
+Â Â Â Â cipher = ""
+Â Â 
+Â Â Â Â # track key indices
+Â Â Â Â k_indx = 0
+Â Â 
+Â Â Â Â msg_len = float(len(msg))
+Â Â Â Â msg_lst = list(msg)
+Â Â Â Â key_lst = sorted(list(key))
+Â Â 
+Â Â Â Â # calculate column of the matrix
+Â Â Â Â col = len(key)
+Â Â Â Â Â Â 
+Â Â Â Â # calculate maximum row of the matrix
+Â Â Â Â row = int(math.ceil(msg_len / col))
+Â Â 
+Â Â Â Â # add the padding character '_' in empty
+Â Â Â Â # the empty cell of the matixÂ 
+Â Â Â Â fill_null = int((row * col) - msg_len)
+Â Â Â Â msg_lst.extend('_' * fill_null)
+Â Â 
+Â Â Â Â # create Matrix and insert message andÂ 
+Â Â Â Â # padding characters row-wiseÂ 
+Â Â Â Â matrix = [msg_lst[i: i + col]Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â for i in range(0, len(msg_lst), col)]
+Â Â 
+Â Â Â Â # read matrix column-wise using key
+Â Â Â Â for _ in range(col):
+Â Â Â Â Â Â Â Â curr_idx = key.index(key_lst[k_indx])
+Â Â Â Â Â Â Â Â cipher += ''.join([row[curr_idx]Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â for row in matrix])
+Â Â Â Â Â Â Â Â k_indx += 1
+Â Â 
+Â Â Â Â return cipher
+Â Â 
+# Decryption
+def decryptMessage(cipher):
+Â Â Â Â msg = ""
+Â Â 
+Â Â Â Â # track key indices
+Â Â Â Â k_indx = 0
+Â Â 
+Â Â Â Â # track msg indices
+Â Â Â Â msg_indx = 0
+Â Â Â Â msg_len = float(len(cipher))
+Â Â Â Â msg_lst = list(cipher)
+Â Â 
+Â Â Â Â # calculate column of the matrix
+Â Â Â Â col = len(key)
+Â Â Â Â Â Â 
+Â Â Â Â # calculate maximum row of the matrix
+Â Â Â Â row = int(math.ceil(msg_len / col))
+Â Â 
+Â Â Â Â # convert key into list and sortÂ 
+Â Â Â Â # alphabetically so we can accessÂ 
+Â Â Â Â # each character by its alphabetical position.
+Â Â Â Â key_lst = sorted(list(key))
+Â Â 
+Â Â Â Â # create an empty matrix toÂ 
+Â Â Â Â # store deciphered message
+Â Â Â Â dec_cipher = []
+Â Â Â Â for _ in range(row):
+Â Â Â Â Â Â Â Â dec_cipher += [[None] * col]
+Â Â 
+Â Â Â Â # Arrange the matrix column wise accordingÂ 
+Â Â Â Â # to permutation order by adding into new matrix
+Â Â Â Â for _ in range(col):
+Â Â Â Â Â Â Â Â curr_idx = key.index(key_lst[k_indx])
+Â Â 
+Â Â Â Â Â Â Â Â for j in range(row):
+Â Â Â Â Â Â Â Â Â Â Â Â dec_cipher[j][curr_idx] = msg_lst[msg_indx]
+Â Â Â Â Â Â Â Â Â Â Â Â msg_indx += 1
+Â Â Â Â Â Â Â Â k_indx += 1
+Â Â 
+Â Â Â Â # convert decrypted msg matrix into a string
+Â Â Â Â try:
+Â Â Â Â Â Â Â Â msg = ''.join(sum(dec_cipher, []))
+Â Â Â Â except TypeError:
+Â Â Â Â Â Â Â Â raise TypeError("This program cannot",
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â "handle repeating words.")
+Â Â 
+Â Â Â Â null_count = msg.count('_')
+Â Â 
+Â Â Â Â if null_count > 0:
+Â Â Â Â Â Â Â Â return msg[: -null_count]
+Â Â 
+Â Â Â Â return msg
+Â Â 
+# Driver Code
+msg = "Geeks for Geeks"
+Â Â 
+cipher = encryptMessage(msg)
+print("Encrypted Message: {}".
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â format(cipher))
+Â Â 
+print("Decryped Message: {}".
+Â Â Â Â Â Â Â format(decryptMessage(cipher)))
+Â Â 
