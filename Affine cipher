@@ -1,0 +1,56 @@
+#include <stdio.h>
+
+// Function to find modular multiplicative inverse of a (a^-1) using extended Euclidean algorithm
+int modInverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++) {
+        if ((a * x) % m == 1) {
+            return x;
+        }
+    }
+    return -1; // No modular inverse exists
+}
+
+// Function to decrypt ciphertext using affine cipher
+void affineDecrypt(char *ciphertext, int a, int b) {
+    int m = 26; // Size of the alphabet (English)
+    int aInverse = modInverse(a, m);
+    if (aInverse == -1) {
+        printf("Error: Modular inverse of 'a' does not exist.\n");
+        return;
+    }
+
+    for (int i = 0; ciphertext[i] != '\0'; i++) {
+        char ch = ciphertext[i];
+        if (ch >= 'A' && ch <= 'Z') {
+            int y = ch - 'A';
+            int x = (aInverse * (y - b + m)) % m;
+            printf("%c", (x + 'A'));
+        } else if (ch >= 'a' && ch <= 'z') {
+            int y = ch - 'a';
+            int x = (aInverse * (y - b + m)) % m;
+            printf("%c", (x + 'a'));
+        } else {
+            printf("%c", ch); // Non-alphabetic characters remain unchanged
+        }
+    }
+}
+
+int main() {
+    char ciphertext[] = "BUBABUBUBUBABUBABUBABUBUBABUBUBUBUBABUB";
+    int mostFreqChar = 'B' - 'A'; // 'B' mapped to 'E'
+    int secondFreqChar = 'U' - 'A'; // 'U' mapped to 'T'
+    int a, b;
+
+    // Calculate coefficient a
+    a = modInverse((mostFreqChar - secondFreqChar + 26) % 26, 26);
+
+    // Calculate coefficient b
+    b = (a * (mostFreqChar - ('E' - 'A')) + 26) % 26;
+
+    printf("Affine Cipher Decryption: ");
+    affineDecrypt(ciphertext, a, b);
+    printf("\n");
+
+    return 0;
+}
