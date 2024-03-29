@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+#define MAX_TEXT_LENGTH 100
+
+// Function to encrypt a message using the Hill cipher
+void encrypt(char *plaintext, int key[][2]) {
+    int len = strlen(plaintext);
+    int i, j, k;
+    int plaintextVector[2];
+    int cipherVector[2];
+
+    printf("Encrypted Message: ");
+    for (i = 0; i < len; i += 2) {
+        // Convert plaintext characters to numerical values
+        plaintextVector[0] = plaintext[i] - 'A';
+        plaintextVector[1] = plaintext[i + 1] - 'A';
+
+        // Multiply key matrix with plaintext vector
+        for (j = 0; j < 2; j++) {
+            cipherVector[j] = 0;
+            for (k = 0; k < 2; k++) {
+                cipherVector[j] += key[j][k] * plaintextVector[k];
+            }
+            cipherVector[j] %= 26; // Take modulo 26
+        }
+
+        // Convert numerical values back to characters and print
+        for (j = 0; j < 2; j++) {
+            printf("%c", cipherVector[j] + 'A');
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    char plaintext[MAX_TEXT_LENGTH];
+    int key[2][2] = {{3, 2}, {5, 7}}; // Example key matrix
+
+    printf("Enter plaintext (uppercase letters only, no spaces, even length): ");
+    scanf("%s", plaintext);
+
+    if (strlen(plaintext) % 2 != 0) {
+        printf("Plaintext length must be even.\n");
+        return 1;
+    }
+
+    encrypt(plaintext, key);
+
+    return 0;
+}
