@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <string.h>
+
+// Function to find the position of a character in the key square
+void findPosition(char key[5][5], char ch, int *row, int *col) {
+    int i, j;
+    for (i = 0; i < 5; i++) {
+        for (j = 0; j < 5; j++) {
+            if (key[i][j] == ch) {
+                *row = i;
+                *col = j;
+                return;
+            }
+        }
+    }
+}
+
+// Function to decrypt a pair of characters using the key square
+void decryptPair(char key[5][5], char a, char b) {
+    int row1, col1, row2, col2;
+    findPosition(key, a, &row1, &col1);
+    findPosition(key, b, &row2, &col2);
+
+    if (row1 == row2) {
+        col1 = (col1 - 1 + 5) % 5;
+        col2 = (col2 - 1 + 5) % 5;
+        printf("%c%c", key[row1][col1], key[row2][col2]);
+    } else if (col1 == col2) {
+        row1 = (row1 - 1 + 5) % 5;
+        row2 = (row2 - 1 + 5) % 5;
+        printf("%c%c", key[row1][col1], key[row2][col2]);
+    } else {
+        printf("%c%c", key[row1][col2], key[row2][col1]);
+    }
+}
+
+// Function to decrypt the Playfair cipher message
+void decryptMessage(char key[5][5], char message[]) {
+    int i = 0;
+    while (i < strlen(message)) {
+        char a = message[i];
+        char b = message[i + 1];
+        decryptPair(key, a, b);
+        i += 2;
+    }
+}
+
+int main() {
+    char key[5][5] = {{'K', 'X', 'J', 'E', 'Y'},
+                      {'U', 'R', 'E', 'B', 'Z'},
+                      {'W', 'H', 'Y', 'T', 'U'},
+                      {'H', 'E', 'Y', 'F', 'S'},
+                      {'K', 'R', 'E', 'H', 'E'}};
+
+    char message[] = "KXJEYUREBEZWEHEWRYTUHEYFSKREHEGOYFIWTTTUOLKSYCAJPOBOTEIZONTXBYBNTGONEYCUZWRGDSONSXBOUYWRHEBAAHYUSEDQ";
+
+    printf("Decrypted Message: ");
+    decryptMessage(key, message);
+
+    return 0;
+}
