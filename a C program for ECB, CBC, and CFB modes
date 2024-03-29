@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <openssl/des.h>
+
+#define BLOCK_SIZE 8 // DES block size in bytes
+
+// Function to encrypt plaintext using ECB mode with padding
+void encrypt_ECB(const unsigned char *plaintext, int plaintext_len, const unsigned char *key, unsigned char *ciphertext) {
+    DES_key_schedule schedule;
+    DES_set_key((DES_cblock *)key, &schedule);
+    DES_ecb_encrypt((DES_cblock *)plaintext, (DES_cblock *)ciphertext, &schedule, DES_ENCRYPT);
+}
+
+// Function to decrypt ciphertext using ECB mode with padding
+void decrypt_ECB(const unsigned char *ciphertext, int ciphertext_len, const unsigned char *key, unsigned char *plaintext) {
+    DES_key_schedule schedule;
+    DES_set_key((DES_cblock *)key, &schedule);
+    DES_ecb_encrypt((DES_cblock *)ciphertext, (DES_cblock *)plaintext, &schedule, DES_DECRYPT);
+}
+
+// Function to encrypt plaintext using CBC mode with padding
+void encrypt_CBC(const unsigned char *plaintext, int plaintext_len, const unsigned char *key,
+                 const unsigned char *iv, unsigned char *ciphertext) {
+    DES_key_schedule schedule;
+    DES_set_key((DES_cblock *)key, &schedule);
+
+    DES_cblock ivec;
+    memcpy(ivec, iv, BLOCK_SIZE);
+
+    DES_ncbc_encrypt(plaintext, ciphertext, plaintext_len, &schedule, &ivec, DES_ENCRYPT);
+}
+
+// Function to decrypt ciphertext using CBC mode with padding
+void decrypt_CBC(const unsigned char *ciphertext, int ciphertext_len, const unsigned char *key,
+                 const unsigned char *iv, unsigned char *plaintext) {
+    DES_key_schedule schedule;
+    DES_set_key((DES_cblock *)key, &schedule);
+
+    DES_cblock ivec;
+    memcpy(ivec, iv, BLOCK_SIZE);
+
+    DES_ncbc_encrypt(ciphertext, plaintext, ciphertext_len, &schedule, &ivec, DES_DECRYPT);
+}
+
+// Function to encrypt plaintext using CFB mode with padding
+void encrypt_CFB(const unsigned char *plaintext, int plaintext_len, const unsigned char *key,
+                 const unsigned char *iv, unsigned char *ciphertext) {
+    DES_key_schedule schedule;
+    DES_set_key((DES_cblock *)key, &schedule);
+
+    DES_cblock ivec;
+    memcpy(ivec, iv, BLOCK_SIZE);
+
+    DES_cfb_encrypt(plaintext, ciphertext, 1, plaintext_len, &schedule, &ivec, DES_ENCRYPT);
+}
+
+// Function to decrypt ciphertext using CFB mode with padding
+void decrypt_CFB(const unsigned char *ciphertext, int ciphertext_len, const unsigned char *key,
+                 const unsigned char *iv, unsigned char *plaintext) {
+    DES_key_schedule schedule;
+    DES_set_key((DES_cblock *)key, &schedule);
+
+    DES_cblock ivec;
+    memcpy(ivec, iv, BLOCK_SIZE);
+
+    DES_cfb_encrypt(ciphertext, plaintext, 1, ciphertext_len, &schedule, &ivec, DES_DECRYPT);
+}
+
+int main() {
+    unsigned char key[8] = "12345678"; // 8-byte DES key
+    unsigned char iv[8] = "87654321"; // 8-byte initialization vector
+    const char *plaintext = "Hello, world!";
+    unsigned char ciphertext[1024]; // Make sure it's large enough to hold the encrypted data
+    unsigned char decryptedtext[1024];
+
+    printf("Plaintext: %s\n", plaintext);
+
+    // ECB Mode
+    printf("\nECB Mode:\n");
+    encrypt_ECB((unsigned char *)plaintext, strlen(plaintext), key, ciphertext);
+    printf("Encrypted Text: ");
+    for (int i = 0; i < strlen(plaintext); i++) {
+        printf("%02X", ciphertext[i]);
+    }
+    printf("\n");
+
+    decrypt_ECB(ciphertext, strlen(plaintext), key, decryptedtext);
+    printf("Decrypted Text: %s\n", decryptedtext);
+
+    // CBC Mode
+    printf("\nCBC Mode:\n");
+    encrypt_CBC((unsigned char *)plaintext, strlen(plaintext), key, iv, ciphertext);
+    printf("Encrypted Text: ");
+    for (int i = 0; i < strlen(plaintext); i++) {
+        printf("%02X", ciphertext[i]);
+    }
+    printf("\n");
+
+    decrypt_CBC(ciphertext, strlen(plaintext), key, iv, decryptedtext);
+    printf("Decrypted Text: %s\n", decryptedtext);
+
+    // CFB Mode
+    printf("\nCFB Mode:\n");
+    encrypt_CFB((unsigned char *)plaintext, strlen(plaintext), key, iv, ciphertext);
+    printf("Encrypted Text: ");
+    for (int i = 0; i < strlen(plaintext); i++) {
+        printf("%02X", ciphertext[i]);
+    }
+    printf("\n");
+
+    decrypt_CFB(ciphertext, strlen(plaintext), key, iv, decryptedtext);
+    printf("Decrypted Text: %s\n", decryptedtext);
+
+    return 0;
+}
