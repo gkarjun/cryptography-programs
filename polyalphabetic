@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Function to encrypt a message using a polyalphabetic substitution cipher
+void polyalphabeticSubstitutionEncrypt(char *plaintext, char *key, char *ciphertext) {
+    int i, j;
+    int keyLen = strlen(key);
+
+    for (i = 0, j = 0; i < strlen(plaintext); i++) {
+        // Only encrypt alphabetic characters
+        if (isalpha(plaintext[i])) {
+            // Determine the shift value based on the corresponding character in the key
+            int shift = tolower(key[j % keyLen]) - 'a';
+
+            // Encrypt uppercase letters
+            if (isupper(plaintext[i]))
+                ciphertext[i] = (plaintext[i] - 'A' + shift) % 26 + 'A';
+            // Encrypt lowercase letters
+            else
+                ciphertext[i] = (plaintext[i] - 'a' + shift) % 26 + 'a';
+
+            j++; // Move to the next character in the key
+        } else {
+            // Non-alphabetic characters remain unchanged
+            ciphertext[i] = plaintext[i];
+        }
+    }
+    ciphertext[i] = '\0'; // Null-terminate the ciphertext string
+}
+
+int main() {
+    char plaintext[1000], key[100], ciphertext[1000];
+
+    printf("Enter plaintext to encrypt: ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+    printf("Enter the encryption key: ");
+    fgets(key, sizeof(key), stdin);
+
+    // Remove trailing newline characters from fgets
+    plaintext[strcspn(plaintext, "\n")] = '\0';
+    key[strcspn(key, "\n")] = '\0';
+
+    polyalphabeticSubstitutionEncrypt(plaintext, key, ciphertext);
+
+    printf("Encrypted text: %s\n", ciphertext);
+
+    return 0;
+}
